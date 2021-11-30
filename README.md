@@ -1,0 +1,2 @@
+# pixi
+pixijs+react+vite
