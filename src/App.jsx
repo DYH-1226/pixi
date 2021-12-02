@@ -14,7 +14,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import * as PIXI from 'pixi.js';
 import './app.css'
-
+import { base64Images } from './img/base64image';
+const urlPr = 'https://dyh-image-bed-1303123520.cos.ap-guangzhou.myqcloud.com/image/2021122'
 //创建树对象
 const treeObj = function(dir,row,col,trees_num) {
 	//定义x周距中心偏移量
@@ -178,7 +179,7 @@ const App = (props) => {
     //建立背景容器
 		let container_bg = new PIXI.Container();
 		app.stage.addChild(container_bg);
-		let sprite_bg = new PIXI.Sprite.from('/src/img/bg.jpg');
+		let sprite_bg = new PIXI.Sprite.from(base64Images.bg);
 		container_bg.addChild(sprite_bg);
 
 
@@ -198,6 +199,7 @@ const App = (props) => {
     container_tree.width = 800;
 		container_tree.height = 520;
 
+	
 		let texture = PIXI.Texture.from('/src/img/tree.png');
 		let treesInit = [
 			{num:5,dir:'left',col:0},
@@ -212,7 +214,9 @@ const App = (props) => {
 		treesInit.map(function(v,index) {
 			for (let i = 0; i < v.num; i++) {
 				let tree_obj = new treeObj(v.dir,i,v.col,v.num);
-				let tree = new PIXI.Sprite(texture);
+			
+				let tree = new PIXI.Sprite.from(base64Images.tree);
+
 				tree.anchor.set(tree.width/2,tree.height);
 				tree.x = tree_obj.get_x(tree_obj.get_initY());
 				tree.y = tree_obj.get_y();
@@ -245,10 +249,14 @@ const App = (props) => {
 		container_gift.width = 800;
 		container_gift.height = 520;
 
-    let gift1 = PIXI.Texture.from('/src/img/gift1.png');
-    let gift2 = PIXI.Texture.from('/src/img/gift2.png');
-    let gift3 = PIXI.Texture.from('/src/img/gift3.png');
-    let giftPic = [gift1,gift2,gift3];
+    // let gift1 = PIXI.Texture.from('/src/img/gift1.png');
+    // let gift2 = PIXI.Texture.from('/src/img/gift2.png');
+    // let gift3 = PIXI.Texture.from('/src/img/gift3.png');
+    let giftPic = [
+			base64Images.gift1,
+			base64Images.gift2,
+			base64Images.gift3
+		];
     let scrollGift = [];
 
     let k = 0,timeInit;
@@ -258,7 +266,8 @@ const App = (props) => {
 				let gift_obj = new giftObj();
 				let giftNum = Math.round(Math.random()*2+0);
 				gift_obj.num = giftNum;
-			    let gift = new PIXI.Sprite(giftPic[giftNum]);
+				let gift = new PIXI.Sprite.from(giftPic[giftNum]);
+			    // let gift = new PIXI.Sprite();
 			    gift.anchor.set(1);
 				gift.x = gift_obj.get_x(0);
 			    gift.y = gift_obj.get_initY();
@@ -287,7 +296,7 @@ const App = (props) => {
     container_p.width = 800
     container_p.height = 520
 
-    let people = PIXI.Sprite.from('/src/img/people.png')
+    let people = PIXI.Sprite.from(base64Images.people)
     container_p.addChild(people)
     people.scale.set(0.6)
     people.x = 400
@@ -295,7 +304,6 @@ const App = (props) => {
     people.vx = 0
     people.vy = 0
 
-    let a = 0
     //给小人键盘事件让其移动
     let left = keyboard("ArrowLeft")
     let up = keyboard("ArrowUp")
@@ -334,6 +342,111 @@ const App = (props) => {
       people.x += people.vx
       people.y += people.vy
     }
+
+
+		//绘制文字
+		let style = new PIXI.TextStyle({
+			fontFamily: 'Arial',
+			fontSize: 36,
+			fontStyle: 'italic',
+			fontWeight: 'bold',
+			fill: ['#ffffff', '#00ff99'], // gradient
+			stroke: '#4a1850',
+			strokeThickness: 5,
+			dropShadow: true,
+			dropShadowColor: '#000000',
+			dropShadowBlur: 4,
+			dropShadowAngle: Math.PI / 6,
+			dropShadowDistance: 6,
+			wordWrap: true,
+			wordWrapWidth: 440
+		});
+		
+		let richText1 = new PIXI.Text('0', style);
+		let richText2 = new PIXI.Text('0', style);
+		let richText3 = new PIXI.Text('0', style);
+		richText1.x = 90;
+		richText1.y = 63;
+		richText1.anchor.x = 0.5;
+		richText1.anchor.y = 0.5;
+		richText2.x = 188;
+		richText2.y = 63;
+		richText2.anchor.x = 0.5;
+		richText2.anchor.y = 0.5;
+		richText3.x = 280;
+		richText3.y = 63;
+		richText3.anchor.x = 0.5;
+		richText3.anchor.y = 0.5;
+		app.stage.addChild(richText1);
+		app.stage.addChild(richText2);
+		app.stage.addChild(richText3);
+
+				
+		let textAdd = new PIXI.Text('+1', style);
+		textAdd.x = 420;
+		textAdd.y = 200;
+		textAdd.anchor.x = 0.5;
+		textAdd.anchor.y = 1;
+		textAdd.scale.set(0);
+		app.stage.addChild(textAdd);
+
+		let count = 0,ani;
+		function animate() {
+			count+= 0.2;
+			textAdd.scale.set(count);
+			if(count >= 3) {
+				count = 0;
+				textAdd.scale.set(0);
+				cancelAnimationFrame(ani);
+				return;
+			}
+			ani = requestAnimationFrame(animate);
+		}
+
+				//吃掉后加分
+				app.ticker.add(function(delta) {
+					for(let i = 0,flag = true;i < l; flag?i++:i) {
+						let tickObj = scrollGift[i],
+						speed = tickObj.gift_obj.mathSpeed;
+						tickObj.gift.y+=speed;
+						tickObj.gift.x = tickObj.gift_obj.get_x(tickObj.gift.y-190);
+						let scale_num = tickObj.gift_obj.get_scale(tickObj.gift.y);
+							tickObj.gift.scale.set(scale_num);
+							
+							if(tickObj.gift.y >= 560) {
+								tickObj.gift.y = tickObj.gift_obj.get_initY();
+								tickObj.gift.x = tickObj.gift_obj.get_x(0);
+								let scale_num = tickObj.gift_obj.get_scale(tickObj.gift.y-190);
+								tickObj.gift.scale.set(scale_num);
+							}
+							
+							let people_gift = Math.abs(people.x+50 - tickObj.gift.x);
+							if(people_gift < 30 && tickObj.gift.y >= 450) {
+								//console.log("del before "+ l+"---i"+i);
+								//console.log(scrollGift.toString());
+								animate();
+								let num = tickObj.gift_obj.num;
+								if(num == 0) {
+									richText1.text++;
+								} else if(num == 1) {
+									richText2.text++;
+								} else if(num == 2) {
+									richText3.text++;
+								}
+								container_gift.removeChild(tickObj.gift);
+								scrollGift.splice(i,1);
+								flag = false;
+								l = scrollGift.length;
+								//console.log("del "+ l+"---i"+i);
+								//console.log(scrollGift.toString());
+								mathSetGift(false);
+								if(scrollGift.length <= 0) break;
+							} else {
+								flag = true;
+							}
+							
+					}
+				});
   }
 
   return (
@@ -347,4 +460,3 @@ const App = (props) => {
 }
 
 export default App;
-
