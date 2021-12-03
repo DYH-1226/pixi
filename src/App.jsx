@@ -200,7 +200,7 @@ const App = (props) => {
 		container_tree.height = 520;
 
 	
-		let texture = PIXI.Texture.from('/src/img/tree.png');
+		let texture = PIXI.Texture.from('https://dyh-image-bed-1303123520.cos.ap-guangzhou.myqcloud.com/image%2F2021122%2Ftree.png');
 		let treesInit = [
 			{num:5,dir:'left',col:0},
 			{num:7,dir:'left',col:1},
@@ -214,9 +214,7 @@ const App = (props) => {
 		treesInit.map(function(v,index) {
 			for (let i = 0; i < v.num; i++) {
 				let tree_obj = new treeObj(v.dir,i,v.col,v.num);
-			
-				let tree = new PIXI.Sprite.from(base64Images.tree);
-
+				let tree = new PIXI.Sprite.from(texture);
 				tree.anchor.set(tree.width/2,tree.height);
 				tree.x = tree_obj.get_x(tree_obj.get_initY());
 				tree.y = tree_obj.get_y();
@@ -232,16 +230,37 @@ const App = (props) => {
 				treesArr[i].tree.y+=(1+delta);
 				treesArr[i].tree.x = treesArr[i].tree_obj.get_x(treesArr[i].tree.y);
 				let scale_num = treesArr[i].tree_obj.get_scale(treesArr[i].tree.y);
-		    	treesArr[i].tree.scale.set(scale_num);
-		    	if(treesArr[i].tree.y >= 560) {
-		    		treesArr[i].tree.y = 190;
-		    		treesArr[i].tree.x = treesArr[i].tree_obj.get_x(treesArr[i].tree.y);
-		    		let scale_num = treesArr[i].tree_obj.get_scale(treesArr[i].tree.y);
-		    		treesArr[i].tree.scale.set(scale_num);
-		    	}
+				treesArr[i].tree.scale.set(scale_num);
+				if(treesArr[i].tree.y >= 560) {
+					treesArr[i].tree.y = 190;
+					treesArr[i].tree.x = treesArr[i].tree_obj.get_x(treesArr[i].tree.y);
+					let scale_num = treesArr[i].tree_obj.get_scale(treesArr[i].tree.y);
+					treesArr[i].tree.scale.set(scale_num);
+				}
 			}
 		});
 
+		//绘制树
+		// // 创建一个图片精灵
+    // app.loader
+		// 	.add('sss',`https://dyh-image-bed-1303123520.cos.ap-guangzhou.myqcloud.com/image%2F2021122%2Fpeople.png`)
+    // 	.load(setup);
+		// function setup() {
+		// 	let testPic = new PIXI.Sprite(
+		// 		app.loader.resources['sss'].texture
+		// 	);
+		// 	testPic.scale.set(0.5, 0.5);
+		// 	testPic.x = 300;
+		// 	testPic.y = 300;
+		// 	testPic.position.set(300, 300)
+		// 	// 修改旋转中心为图片中心
+		// 	testPic.anchor.set(0.5, 0.5)
+		// 	app.stage.addChild(testPic);
+		// }
+		const ground = PIXI.Texture.from('https://dyh-image-bed-1303123520.cos.ap-guangzhou.myqcloud.com/image%2F2021122%2Fpeople.png')
+    const tilingSprite2 = new PIXI.Sprite(ground)
+    tilingSprite2.y = 150;
+    app.stage.addChild(tilingSprite2)
     
     //绘制礼物
     let container_gift = new PIXI.Container();
@@ -329,7 +348,6 @@ const App = (props) => {
         people.vx = 0;
       }
     };
-
     //Set the game state
     let state = play
     //Start the game loop
@@ -403,50 +421,49 @@ const App = (props) => {
 			ani = requestAnimationFrame(animate);
 		}
 
-				//吃掉后加分
-				app.ticker.add(function(delta) {
-					for(let i = 0,flag = true;i < l; flag?i++:i) {
-						let tickObj = scrollGift[i],
-						speed = tickObj.gift_obj.mathSpeed;
-						tickObj.gift.y+=speed;
-						tickObj.gift.x = tickObj.gift_obj.get_x(tickObj.gift.y-190);
-						let scale_num = tickObj.gift_obj.get_scale(tickObj.gift.y);
-							tickObj.gift.scale.set(scale_num);
-							
-							if(tickObj.gift.y >= 560) {
-								tickObj.gift.y = tickObj.gift_obj.get_initY();
-								tickObj.gift.x = tickObj.gift_obj.get_x(0);
-								let scale_num = tickObj.gift_obj.get_scale(tickObj.gift.y-190);
-								tickObj.gift.scale.set(scale_num);
-							}
-							
-							let people_gift = Math.abs(people.x+50 - tickObj.gift.x);
-							if(people_gift < 30 && tickObj.gift.y >= 450) {
-								//console.log("del before "+ l+"---i"+i);
-								//console.log(scrollGift.toString());
-								animate();
-								let num = tickObj.gift_obj.num;
-								if(num == 0) {
-									richText1.text++;
-								} else if(num == 1) {
-									richText2.text++;
-								} else if(num == 2) {
-									richText3.text++;
-								}
-								container_gift.removeChild(tickObj.gift);
-								scrollGift.splice(i,1);
-								flag = false;
-								l = scrollGift.length;
-								//console.log("del "+ l+"---i"+i);
-								//console.log(scrollGift.toString());
-								mathSetGift(false);
-								if(scrollGift.length <= 0) break;
-							} else {
-								flag = true;
-							}
-							
+		//吃掉后加分
+		app.ticker.add(function(delta) {
+			for(let i = 0,flag = true;i < l; flag?i++:i) {
+				let tickObj = scrollGift[i],
+				speed = tickObj.gift_obj.mathSpeed;
+				tickObj.gift.y+=speed;
+				tickObj.gift.x = tickObj.gift_obj.get_x(tickObj.gift.y-190);
+				let scale_num = tickObj.gift_obj.get_scale(tickObj.gift.y);
+				tickObj.gift.scale.set(scale_num);
+				
+				if(tickObj.gift.y >= 560) {
+					tickObj.gift.y = tickObj.gift_obj.get_initY();
+					tickObj.gift.x = tickObj.gift_obj.get_x(0);
+					let scale_num = tickObj.gift_obj.get_scale(tickObj.gift.y-190);
+					tickObj.gift.scale.set(scale_num);
+				}
+				
+				let people_gift = Math.abs(people.x+50 - tickObj.gift.x);
+				if(people_gift < 30 && tickObj.gift.y >= 450) {
+					//console.log("del before "+ l+"---i"+i);
+					//console.log(scrollGift.toString());
+					animate();
+					let num = tickObj.gift_obj.num;
+					if(num == 0) {
+						richText1.text++;
+					} else if(num == 1) {
+						richText2.text++;
+					} else if(num == 2) {
+						richText3.text++;
 					}
-				});
+					container_gift.removeChild(tickObj.gift);
+					scrollGift.splice(i,1);
+					flag = false;
+					l = scrollGift.length;
+					//console.log("del "+ l+"---i"+i);
+					//console.log(scrollGift.toString());
+					mathSetGift(false);
+					if(scrollGift.length <= 0) break;
+				} else {
+					flag = true;
+				}
+			}
+		});
   }
 
   return (
